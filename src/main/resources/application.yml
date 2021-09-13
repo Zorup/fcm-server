@@ -1,0 +1,5 @@
+server:
+  port: 8084
+
+fcm:
+  keypath: ./alarm-1830c-firebase-adminsdk-vbgdk-636d5e3a1c.json
