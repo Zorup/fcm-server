@@ -1,9 +1,11 @@
 HELP.md
 .gradle
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+alarm-1830c-firebase-adminsdk-vbgdk-636d5e3a1c.json
+
+### OS generated ###
+.DS_Store
+**/.DS_Store
 
 ### STS ###
 .apt_generated
