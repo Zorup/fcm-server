@@ -17,3 +17,5 @@ spring:
   #    아래 선언시 -> 구동시 ddl create, 종료시 ddl drop
   #    hibernate:
   #      ddl-auto: update
+
+main-api-url: http://localhost:8082
