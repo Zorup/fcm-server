@@ -3,3 +3,17 @@ server:
 
 fcm:
   keypath: ./alarm-1830c-firebase-adminsdk-vbgdk-636d5e3a1c.json
+
+spring:
+  datasource:
+    url: jdbc:mariadb://localhost:3306/board
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: root
+    password: draw
+  jpa:
+    open-in-view: false
+    generate-ddl: true
+    show-sql: true
+  #    아래 선언시 -> 구동시 ddl create, 종료시 ddl drop
+  #    hibernate:
+  #      ddl-auto: update
