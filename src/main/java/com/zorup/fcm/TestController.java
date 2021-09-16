@@ -25,4 +25,10 @@ public class TestController {
         return mainModule.getUserPushTokenByUserIds(userId);
     }
     //리스트로 처리? 일단 화면단에서 보낼 데이터 가공하면서 추가적으로 생각해볼것..
+
+    //FCM에서 처리해야할 리스트
+    //sender Id와
+    //userIds 리스트로 넘어온 인자,
+    //이벤트 타입을 받아서 엔티티를 등록한다.
+    //엔티티 등록 이후 푸쉬 알람을 보내기 위해서 fcm send 함수를 호출한다. 
 }

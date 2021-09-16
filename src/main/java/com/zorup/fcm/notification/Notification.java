@@ -2,6 +2,7 @@ package com.zorup.fcm.notification;
 
 import lombok.*;
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.io.Serializable;
 
 @Entity
@@ -23,8 +24,24 @@ public class Notification implements Serializable {
     private Long receiverId;
 
     @Column
-    private Long eventType;
+    private Boolean eventType;
 
-    // 하이퍼링크?
-    //일부 내용 첨가?
+    @Column
+    private String content;
+
+    @Column
+    private Boolean readYn;
+
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Transactional
+    public static class NotificationRequest{
+        private Long senderId;
+        private Long[] receiverIds;
+        private Boolean eventType;
+    }
+
 }
