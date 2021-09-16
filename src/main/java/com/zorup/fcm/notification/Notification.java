@@ -4,6 +4,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Getter
@@ -37,11 +38,18 @@ public class Notification implements Serializable {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Transactional
     public static class NotificationRequest{
-        private Long senderId;
-        private Long[] receiverIds;
+        private UserInformation sender;
+        private List<UserInformation> receivers;
         private Boolean eventType;
     }
 
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserInformation{
+        private Long userId;
+        private String userName;
+    }
 }

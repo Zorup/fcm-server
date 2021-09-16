@@ -38,9 +38,14 @@ public class FCMService {
         }
     }
 
-
-    //실질적으로 원하는 서비스는 메시지니까 데이터 말고 메시지 세팅해야됨
-    //data는 해당 알람과 관련된 url등을 보내는 식으로 활용 가능하다하네.
+    /**
+     * TODO
+     *   public BatchResponse sendAll(
+     *       @NonNull List<Message> messages, boolean dryRun) throws FirebaseMessagingException {
+     *     return sendAllOp(messages, dryRun).call();
+     *   }
+     * 관련해서 Documentation 보고 참고해서 여러 메시지 한번에 처리 가능하도록 바꾸고 테스트 필요
+     * */
     public void sendNotification(String userPushToken,String title, String content, Map<String, String> eventMap){
         Message msg = Message.builder()
                 .setNotification(

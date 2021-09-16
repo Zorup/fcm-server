@@ -1,5 +1,7 @@
 package com.zorup.fcm.notification;
 
+import com.zorup.fcm.FCMService;
+import com.zorup.fcm.notification.Notification.UserInformation;
 import com.zorup.fcm.util.MainModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final MainModule mainModule;
+    private final FCMService fcmService;
     private final String CHAT_BASE_MESSAGE = "님으로부터 채팅이 도착했습니다.";
     private final String MENTION_BASE_MESSAGE = "님이 덧글을 남기셨습니다.";
 
@@ -32,18 +35,35 @@ public class NotificationService {
      * */
     public void saveNotification(Notification.NotificationRequest param){
         List<Notification> notifications = new ArrayList<>();
-        Long senderId = param.getSenderId();
+        UserInformation sender = param.getSender();
+        List<UserInformation> receivers = param.getReceivers();
         Boolean eventType = param.getEventType();
-        Long[] receiverIds = param.getReceiverIds();
+        String content = getBaseMessage(eventType);
 
-        for(Long receiverId : receiverIds){
+        makeNotificationEntity(notifications, sender, receivers, eventType, content);
+        notificationRepository.saveAll(notifications);
+    }
+
+
+
+    private void makeNotificationEntity(List<Notification> notifications, UserInformation sender, List<UserInformation> receivers, Boolean eventType, String content) {
+        for(UserInformation receiver : receivers){
             Notification notification = Notification.builder()
-                    .senderId(senderId)
+                    .senderId(sender.getUserId())
                     .eventType(eventType)
-                    .receiverId(receiverId)
+                    .receiverId(receiver.getUserId())
                     .readYn(false)
-                    .content(null)
+                    .content(sender.getUserName()+ content)
                     .build();
+            notifications.add(notification);
+        }
+    }
+
+    private String getBaseMessage(Boolean eventType) {
+        if(Boolean.TRUE.equals(eventType)){
+            return MENTION_BASE_MESSAGE;
+        }else{
+            return CHAT_BASE_MESSAGE;
         }
     }
 
