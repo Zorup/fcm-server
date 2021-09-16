@@ -13,4 +13,4 @@
 
 ### Preference
  1. Fire Base Admin Documentation : [FCM SDK](https://firebase.google.com/docs/reference/admin/java/reference/com/google/firebase/messaging/Message.Builder.html)
- 
+ 2. Message Format : [Message Format](https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages)
