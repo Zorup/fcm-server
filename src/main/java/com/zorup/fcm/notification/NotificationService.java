@@ -32,7 +32,7 @@ public class NotificationService {
         log.info("SUCCESS :: save notification data");
 
         log.info("START :: send Web Push Message");
-        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", "test");
+        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", "웹 푸쉬");
         log.info("SUCCESS :: push Web Message");
     }
 
@@ -49,7 +49,7 @@ public class NotificationService {
             notifications.add(notification);
             receiverIds.add(receiver.getUserId());
         }
-        return (Long[]) receiverIds.toArray();
+        return receiverIds.toArray(new Long[receiverIds.size()]);
     }
 
     private String getBaseMessage(Boolean eventType) {
