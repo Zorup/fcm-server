@@ -1,5 +1,7 @@
-package com.zorup.fcm;
+package com.zorup.fcm.notification;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.zorup.fcm.notification.Notification.NotificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,21 +9,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @ResponseBody
 @RequestMapping("/v1")
-public class FCMController {
-    private final FCMService fcmService;
+public class NotificationController {
+    private final NotificationService notificationService;
 
     @PostMapping("/fcm-msg")
-    public boolean sendFcmMessage(String pushToken){
-        Map<String, String> eventMap = new HashMap<>();
-        fcmService.sendNotification(pushToken, "mention", "사용자 멘션", eventMap);
+    public boolean sendFcmMessage(NotificationRequest param) throws JsonProcessingException {
+        notificationService.saveNotification(param);
         return true;
     }
 }

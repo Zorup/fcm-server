@@ -2,8 +2,8 @@ package com.zorup.fcm.notification;
 
 import lombok.*;
 import javax.persistence.*;
-import javax.transaction.Transactional;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
