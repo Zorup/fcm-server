@@ -57,6 +57,7 @@ public class FCMService {
         data.put("eventType", event);
 
         for(UserTokenInfo userTokenInfo : userTokenInfos) {
+            if(userTokenInfo.getPushToken() == null) continue;
             Message msg = Message.builder()
                     .setNotification(
                             Notification.builder()
