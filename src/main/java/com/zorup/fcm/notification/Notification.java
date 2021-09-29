@@ -3,6 +3,7 @@ package com.zorup.fcm.notification;
 import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -32,6 +33,8 @@ public class Notification implements Serializable {
     @Column
     private Boolean readYn;
 
+    @Column
+    private LocalDateTime createDate;
 
     @Getter
     @Setter

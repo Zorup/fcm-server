@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,12 @@ public class NotificationService {
         log.info("SUCCESS :: push Web Message");
     }
 
+    public List<Notification> getUserNotificationList(Long receiverId){
+        return notificationRepository.findByReceiverIdAndEventTypeIsTrue(receiverId);
+    }
+
     private Long[] makeNotificationEntity(List<Notification> notifications, UserInformation sender, List<UserInformation> receivers, Boolean eventType, String content) {
+        LocalDateTime createTime = LocalDateTime.now();
         List<Long> receiverIds = new ArrayList<>();
         for(UserInformation receiver : receivers){
             Notification notification = Notification.builder()
@@ -45,6 +51,7 @@ public class NotificationService {
                     .receiverId(receiver.getUserId())
                     .readYn(false)
                     .content(sender.getUserName()+ content)
+                    .createDate(createTime)
                     .build();
             notifications.add(notification);
             receiverIds.add(receiver.getUserId());

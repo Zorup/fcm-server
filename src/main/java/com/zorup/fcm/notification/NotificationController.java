@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -18,5 +20,10 @@ public class NotificationController {
     public boolean sendFcmMessage(@RequestBody NotificationRequest param) throws JsonProcessingException {
         notificationService.saveNotification(param);
         return true;
+    }
+
+    @GetMapping("/user/{userId}/mentions")
+    public List<Notification> getUserMentionList(@PathVariable Long userId){
+        return notificationService.getUserNotificationList(userId);
     }
 }
