@@ -1,6 +1,7 @@
 package com.zorup.fcm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,8 @@ import static com.zorup.fcm.util.TokenQueryResponse.*;
 public class FCMService {
     @Autowired
     Environment env;
+    @Autowired
+    ObjectMapper objectMapper;
     FirebaseMessaging instance;
     private final MainModule mainModule;
 
@@ -49,16 +53,27 @@ public class FCMService {
         }
     }
 
-    public void sendNotifications(Long senderId, Long[] receiverIds, String event, String content) throws JsonProcessingException {
+    public void sendNotifications(Long senderId, Long[] receiverIds,
+                                  String event, String content,
+                                  LocalDateTime createTime,
+                                  Map<Long, Long> userNotificationInfo) throws JsonProcessingException {
+
         List<UserTokenInfo> userTokenInfos = mainModule.getUserPushTokenByUserIds(receiverIds);
         List<Message> msgs = new ArrayList<>();
+
         Map<String, String> data = new HashMap<>();
         data.put("senderId", senderId.toString());
         data.put("eventType", event);
         data.put("content", content);
+        data.put("readYn", "false");
+        //프론트단에서 역직렬화해서 풀어서써야됨
+        data.put("createTime", objectMapper.writeValueAsString(createTime));
 
         for(UserTokenInfo userTokenInfo : userTokenInfos) {
             if(userTokenInfo.getPushToken() == null) continue;
+            data.remove("notificationId");
+            data.put("notificationId", userNotificationInfo.get(userTokenInfo.getUserId()).toString());
+
             Message msg = Message.builder()
                     .setNotification(
                             Notification.builder()

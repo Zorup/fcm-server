@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -24,6 +26,7 @@ public class NotificationService {
 
     public void saveNotification(NotificationRequest param) throws JsonProcessingException {
         List<Notification> notifications = new ArrayList<>();
+        Map<Long, Long> userNotificationInfo = new HashMap<>();
         UserInformation sender = param.getSender();
         List<UserInformation> receivers = param.getReceivers();
         Boolean eventType = param.getEventType();
@@ -31,12 +34,17 @@ public class NotificationService {
         String content = getBaseMessage(eventType);
         content = sender.getUserName()+ content;
 
-        Long[] receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content);
-        notificationRepository.saveAll(notifications);
+        LocalDateTime createTime = LocalDateTime.now();
+        Long[] receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content, createTime);
+        notifications = notificationRepository.saveAll(notifications);
         log.info("SUCCESS :: save notification data");
 
+        for(Notification notification : notifications){
+            userNotificationInfo.put(notification.getReceiverId(), notification.getNotificationId());
+        }
+
         log.info("START :: send Web Push Message");
-        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", content);
+        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", content, createTime, userNotificationInfo);
         log.info("SUCCESS :: push Web Message");
     }
 
@@ -44,8 +52,9 @@ public class NotificationService {
         return notificationRepository.findByReceiverIdAndEventTypeIsTrue(receiverId);
     }
 
-    private Long[] makeNotificationEntity(List<Notification> notifications, UserInformation sender, List<UserInformation> receivers, Boolean eventType, String content) {
-        LocalDateTime createTime = LocalDateTime.now();
+    private Long[] makeNotificationEntity(List<Notification> notifications, UserInformation sender,
+                                          List<UserInformation> receivers, Boolean eventType,
+                                          String content, LocalDateTime createTime) {
         List<Long> receiverIds = new ArrayList<>();
         for(UserInformation receiver : receivers){
             Notification notification = Notification.builder()
