@@ -62,8 +62,6 @@ public class FCMService {
         List<Message> msgs = new ArrayList<>();
 
         Map<String, String> data = new HashMap<>();
-        data.put("senderId", senderId.toString());
-        data.put("eventType", event);
         data.put("content", content);
         data.put("readYn", "false");
         //프론트단에서 역직렬화해서 풀어서써야됨
