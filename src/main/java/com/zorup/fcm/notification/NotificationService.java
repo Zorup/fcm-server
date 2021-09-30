@@ -27,13 +27,16 @@ public class NotificationService {
         UserInformation sender = param.getSender();
         List<UserInformation> receivers = param.getReceivers();
         Boolean eventType = param.getEventType();
+
         String content = getBaseMessage(eventType);
+        content = sender.getUserName()+ content;
+
         Long[] receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content);
         notificationRepository.saveAll(notifications);
         log.info("SUCCESS :: save notification data");
 
         log.info("START :: send Web Push Message");
-        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", "웹 푸쉬");
+        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", content);
         log.info("SUCCESS :: push Web Message");
     }
 
@@ -50,7 +53,7 @@ public class NotificationService {
                     .eventType(eventType)
                     .receiverId(receiver.getUserId())
                     .readYn(false)
-                    .content(sender.getUserName()+ content)
+                    .content(content)
                     .createDate(createTime)
                     .build();
             notifications.add(notification);

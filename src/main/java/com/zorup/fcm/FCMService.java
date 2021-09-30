@@ -55,6 +55,7 @@ public class FCMService {
         Map<String, String> data = new HashMap<>();
         data.put("senderId", senderId.toString());
         data.put("eventType", event);
+        data.put("content", content);
 
         for(UserTokenInfo userTokenInfo : userTokenInfos) {
             if(userTokenInfo.getPushToken() == null) continue;
