@@ -65,7 +65,7 @@ public class FCMService {
         data.put("content", content);
         data.put("readYn", "false");
         //프론트단에서 역직렬화해서 풀어서써야됨
-        data.put("createTime", objectMapper.writeValueAsString(createTime));
+        data.put("createDate", objectMapper.writeValueAsString(createTime));
 
         for(UserTokenInfo userTokenInfo : userTokenInfos) {
             if(userTokenInfo.getPushToken() == null) continue;
