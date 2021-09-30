@@ -23,7 +23,7 @@ public class NotificationController {
     }
 
     @GetMapping("/user/{userId}/mentions")
-    public List<Notification> getUserMentionList(@PathVariable Long userId){
+    public List<NotificationProjection> getUserMentionList(@PathVariable Long userId){
         return notificationService.getUserNotificationList(userId);
     }
 }

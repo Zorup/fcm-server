@@ -40,7 +40,7 @@ public class NotificationService {
         log.info("SUCCESS :: push Web Message");
     }
 
-    public List<Notification> getUserNotificationList(Long receiverId){
+    public List<NotificationProjection> getUserNotificationList(Long receiverId){
         return notificationRepository.findByReceiverIdAndEventTypeIsTrue(receiverId);
     }
 
