@@ -23,7 +23,6 @@ public class NotificationService {
     private final String CHAT_BASE_MESSAGE = "님으로부터 채팅이 도착했습니다.";
     private final String MENTION_BASE_MESSAGE = "님이 덧글을 남기셨습니다.";
 
-
     public void saveNotification(NotificationRequest param) throws JsonProcessingException {
         List<Notification> notifications = new ArrayList<>();
         Map<Long, Long> userNotificationInfo = new HashMap<>();
@@ -50,6 +49,13 @@ public class NotificationService {
 
     public List<NotificationProjection> getUserNotificationList(Long receiverId){
         return notificationRepository.findByReceiverIdAndEventTypeIsTrue(receiverId);
+    }
+
+    public boolean patchNotificationReadYn(Long notificationId){
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(IllegalAccessError::new);
+        notification.setReadYn(true);
+        notificationRepository.save(notification);
+        return true;
     }
 
     private Long[] makeNotificationEntity(List<Notification> notifications, UserInformation sender,

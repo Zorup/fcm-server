@@ -26,4 +26,9 @@ public class NotificationController {
     public List<NotificationProjection> getUserMentionList(@PathVariable Long userId){
         return notificationService.getUserNotificationList(userId);
     }
+
+    @PatchMapping("/notification/{notificationId}")
+    public boolean patchReadYn(@PathVariable Long notificationId){
+        return notificationService.patchNotificationReadYn(notificationId);
+    }
 }
