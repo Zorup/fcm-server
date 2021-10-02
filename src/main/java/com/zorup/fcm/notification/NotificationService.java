@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zorup.fcm.FCMService;
 import com.zorup.fcm.notification.Notification.NotificationRequest;
 import com.zorup.fcm.notification.Notification.UserInformation;
+import com.zorup.fcm.util.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,15 +12,28 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.zorup.fcm.util.TokenQueryResponse.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
     private final NotificationRepository notificationRepository;
+    private final RedisRepository redisRepository;
     private final FCMService fcmService;
     private final String CHAT_BASE_MESSAGE = "님으로부터 채팅이 도착했습니다.";
     private final String MENTION_BASE_MESSAGE = "님이 덧글을 남기셨습니다.";
 
+    public void setUserPushToken(Long userId, String token){
+        UserTokenInfo userTokenInfo = new UserTokenInfo();
+        userTokenInfo.setUserId(userId);
+        userTokenInfo.setPushToken(token);
+        redisRepository.insertPushToken(userTokenInfo);
+    }
+
+    public void deleteUserPushToken(Long userId){
+        redisRepository.deletePushToken(userId);
+    }
 
     public void saveNotification(NotificationRequest param) throws JsonProcessingException {
         List<Notification> notifications = new ArrayList<>();
@@ -27,7 +41,7 @@ public class NotificationService {
         List<UserInformation> receivers = param.getReceivers();
         Boolean eventType = param.getEventType();
         String content = getBaseMessage(eventType);
-        Long[] receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content);
+        List<Long> receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content);
         notificationRepository.saveAll(notifications);
         log.info("SUCCESS :: save notification data");
 
@@ -36,7 +50,7 @@ public class NotificationService {
         log.info("SUCCESS :: push Web Message");
     }
 
-    private Long[] makeNotificationEntity(List<Notification> notifications, UserInformation sender, List<UserInformation> receivers, Boolean eventType, String content) {
+    private List<Long> makeNotificationEntity(List<Notification> notifications, UserInformation sender, List<UserInformation> receivers, Boolean eventType, String content) {
         List<Long> receiverIds = new ArrayList<>();
         for(UserInformation receiver : receivers){
             Notification notification = Notification.builder()
@@ -49,7 +63,7 @@ public class NotificationService {
             notifications.add(notification);
             receiverIds.add(receiver.getUserId());
         }
-        return receiverIds.toArray(new Long[receiverIds.size()]);
+        return receiverIds;
     }
 
     private String getBaseMessage(Boolean eventType) {

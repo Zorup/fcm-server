@@ -7,8 +7,7 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.zorup.fcm.util.MainModule;
-import com.zorup.fcm.util.TokenQueryResponse;
+import com.zorup.fcm.util.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +28,11 @@ import static com.zorup.fcm.util.TokenQueryResponse.*;
 @Service
 @RequiredArgsConstructor
 public class FCMService {
-    @Autowired
-    Environment env;
+
+    private final Environment env;
+    private final RedisRepository redisRepository;
+
     FirebaseMessaging instance;
-    private final MainModule mainModule;
 
     @PostConstruct
     private void init() {
@@ -49,8 +49,10 @@ public class FCMService {
         }
     }
 
-    public void sendNotifications(Long senderId, Long[] receiverIds, String event, String content) throws JsonProcessingException {
-        List<UserTokenInfo> userTokenInfos = mainModule.getUserPushTokenByUserIds(receiverIds);
+    public void sendNotifications(Long senderId, List<Long> receiverIds, String event, String content) throws JsonProcessingException {
+        List<UserTokenInfo> userTokenInfos = redisRepository.findPushTokens(receiverIds);
+        log.info("push토큰들 검색 완료");
+
         List<Message> msgs = new ArrayList<>();
         Map<String, String> data = new HashMap<>();
         data.put("senderId", senderId.toString());

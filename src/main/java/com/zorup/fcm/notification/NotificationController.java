@@ -19,4 +19,18 @@ public class NotificationController {
         notificationService.saveNotification(param);
         return true;
     }
+
+    @PatchMapping("/user/{userId}")
+    public boolean setUserPushToken(@PathVariable Long userId,
+                                    @RequestParam(name = "push-token") String pushToken){
+        notificationService.setUserPushToken(userId, pushToken);
+        return true;
+    }
+
+    @DeleteMapping("/user/{userId}")
+    public boolean deleteUserPushToken(@PathVariable Long userId){
+        notificationService.deleteUserPushToken(userId);
+        return true;
+    }
+
 }
