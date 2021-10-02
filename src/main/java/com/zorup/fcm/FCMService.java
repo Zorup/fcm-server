@@ -68,7 +68,7 @@ public class FCMService {
         data.put("createDate", objectMapper.writeValueAsString(createTime));
 
         for(UserTokenInfo userTokenInfo : userTokenInfos) {
-            if(userTokenInfo.getPushToken() == null) continue;
+            if(userTokenInfo == null || userTokenInfo.getPushToken() == null) continue;
             data.remove("notificationId");
             data.put("notificationId", userNotificationInfo.get(userTokenInfo.getUserId()).toString());
 
