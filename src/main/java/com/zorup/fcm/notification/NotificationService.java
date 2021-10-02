@@ -9,8 +9,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.zorup.fcm.util.TokenQueryResponse.*;
 
@@ -23,6 +26,7 @@ public class NotificationService {
     private final FCMService fcmService;
     private final String CHAT_BASE_MESSAGE = "님으로부터 채팅이 도착했습니다.";
     private final String MENTION_BASE_MESSAGE = "님이 덧글을 남기셨습니다.";
+
 
     public void setUserPushToken(Long userId, String token){
         UserTokenInfo userTokenInfo = new UserTokenInfo();
@@ -37,20 +41,43 @@ public class NotificationService {
 
     public void saveNotification(NotificationRequest param) throws JsonProcessingException {
         List<Notification> notifications = new ArrayList<>();
+        Map<Long, Long> userNotificationInfo = new HashMap<>();
         UserInformation sender = param.getSender();
         List<UserInformation> receivers = param.getReceivers();
         Boolean eventType = param.getEventType();
+
         String content = getBaseMessage(eventType);
-        List<Long> receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content);
+        content = sender.getUserName()+ content;
+
+        LocalDateTime createTime = LocalDateTime.now();
+        List<Long> receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content, createTime);
         notificationRepository.saveAll(notifications);
+
         log.info("SUCCESS :: save notification data");
 
+        for(Notification notification : notifications){
+            userNotificationInfo.put(notification.getReceiverId(), notification.getNotificationId());
+        }
+
         log.info("START :: send Web Push Message");
-        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", "웹 푸쉬");
+        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", content, createTime, userNotificationInfo);
         log.info("SUCCESS :: push Web Message");
     }
 
-    private List<Long> makeNotificationEntity(List<Notification> notifications, UserInformation sender, List<UserInformation> receivers, Boolean eventType, String content) {
+    public List<NotificationProjection> getUserNotificationList(Long receiverId){
+        return notificationRepository.findByReceiverIdAndEventTypeIsTrue(receiverId);
+    }
+
+    public boolean patchNotificationReadYn(Long notificationId){
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(IllegalAccessError::new);
+        notification.setReadYn(true);
+        notificationRepository.save(notification);
+        return true;
+    }
+
+    private List<Long> makeNotificationEntity(List<Notification> notifications, UserInformation sender,
+                                              List<UserInformation> receivers, Boolean eventType,
+                                              String content, LocalDateTime createTime) {
         List<Long> receiverIds = new ArrayList<>();
         for(UserInformation receiver : receivers){
             Notification notification = Notification.builder()
@@ -58,7 +85,8 @@ public class NotificationService {
                     .eventType(eventType)
                     .receiverId(receiver.getUserId())
                     .readYn(false)
-                    .content(sender.getUserName()+ content)
+                    .content(content)
+                    .createDate(createTime)
                     .build();
             notifications.add(notification);
             receiverIds.add(receiver.getUserId());

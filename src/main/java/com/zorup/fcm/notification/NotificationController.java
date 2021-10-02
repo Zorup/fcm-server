@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +33,16 @@ public class NotificationController {
     public boolean deleteUserPushToken(@PathVariable Long userId){
         notificationService.deleteUserPushToken(userId);
         return true;
+    }
+
+    @GetMapping("/user/{userId}/mentions")
+    public List<NotificationProjection> getUserMentionList(@PathVariable Long userId){
+        return notificationService.getUserNotificationList(userId);
+    }
+
+    @PatchMapping("/notification/{notificationId}")
+    public boolean patchReadYn(@PathVariable Long notificationId){
+        return notificationService.patchNotificationReadYn(notificationId);
     }
 
 }
