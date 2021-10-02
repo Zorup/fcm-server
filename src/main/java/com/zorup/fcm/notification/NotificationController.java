@@ -22,6 +22,19 @@ public class NotificationController {
         return true;
     }
 
+    @PatchMapping("/user/{userId}")
+    public boolean setUserPushToken(@PathVariable Long userId,
+                                    @RequestParam(name = "push-token") String pushToken){
+        notificationService.setUserPushToken(userId, pushToken);
+        return true;
+    }
+
+    @DeleteMapping("/user/{userId}")
+    public boolean deleteUserPushToken(@PathVariable Long userId){
+        notificationService.deleteUserPushToken(userId);
+        return true;
+    }
+
     @GetMapping("/user/{userId}/mentions")
     public List<NotificationProjection> getUserMentionList(@PathVariable Long userId){
         return notificationService.getUserNotificationList(userId);
@@ -31,4 +44,5 @@ public class NotificationController {
     public boolean patchReadYn(@PathVariable Long notificationId){
         return notificationService.patchNotificationReadYn(notificationId);
     }
+
 }
