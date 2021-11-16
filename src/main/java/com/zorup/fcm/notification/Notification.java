@@ -36,6 +36,9 @@ public class Notification implements Serializable {
     @Column
     private LocalDateTime createDate;
 
+    @Column
+    private Long postId;
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -44,6 +47,7 @@ public class Notification implements Serializable {
         private UserInformation sender;
         private List<UserInformation> receivers;
         private Boolean eventType;
+        private Long postId;
     }
 
     @Getter

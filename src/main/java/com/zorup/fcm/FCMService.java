@@ -55,7 +55,8 @@ public class FCMService {
     public void sendNotifications(Long senderId, List<Long> receiverIds,
                                   String event, String content,
                                   LocalDateTime createTime,
-                                  Map<Long, Long> userNotificationInfo) throws JsonProcessingException {
+                                  Map<Long, Long> userNotificationInfo,
+                                  Long postId) throws JsonProcessingException {
         List<UserTokenInfo> userTokenInfos = redisRepository.findPushTokens(receiverIds);
         log.info("push토큰들 검색 완료");
 
@@ -64,6 +65,7 @@ public class FCMService {
         Map<String, String> data = new HashMap<>();
         data.put("content", content);
         data.put("readYn", "false");
+        data.put("postId", postId.toString());
         //프론트단에서 역직렬화해서 풀어서써야됨
         data.put("createDate", objectMapper.writeValueAsString(createTime));
 

@@ -45,12 +45,13 @@ public class NotificationService {
         UserInformation sender = param.getSender();
         List<UserInformation> receivers = param.getReceivers();
         Boolean eventType = param.getEventType();
+        Long postId = param.getPostId();
 
         String content = getBaseMessage(eventType);
         content = sender.getUserName()+ content;
 
         LocalDateTime createTime = LocalDateTime.now();
-        List<Long> receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content, createTime);
+        List<Long> receiverIds = makeNotificationEntity(notifications, sender, receivers, eventType, content, createTime, postId);
         notificationRepository.saveAll(notifications);
 
         log.info("SUCCESS :: save notification data");
@@ -60,7 +61,7 @@ public class NotificationService {
         }
 
         log.info("START :: send Web Push Message");
-        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", content, createTime, userNotificationInfo);
+        fcmService.sendNotifications(sender.getUserId(), receiverIds, "Mention", content, createTime, userNotificationInfo, postId);
         log.info("SUCCESS :: push Web Message");
     }
 
@@ -77,7 +78,7 @@ public class NotificationService {
 
     private List<Long> makeNotificationEntity(List<Notification> notifications, UserInformation sender,
                                               List<UserInformation> receivers, Boolean eventType,
-                                              String content, LocalDateTime createTime) {
+                                              String content, LocalDateTime createTime, Long postId) {
         List<Long> receiverIds = new ArrayList<>();
         for(UserInformation receiver : receivers){
             Notification notification = Notification.builder()
@@ -87,6 +88,7 @@ public class NotificationService {
                     .readYn(false)
                     .content(content)
                     .createDate(createTime)
+                    .postId(postId)
                     .build();
             notifications.add(notification);
             receiverIds.add(receiver.getUserId());
